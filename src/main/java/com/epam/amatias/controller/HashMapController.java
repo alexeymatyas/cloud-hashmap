@@ -1,5 +1,6 @@
 package com.epam.amatias.controller;
 
+import com.epam.amatias.TrivialStringHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +12,7 @@ import java.util.Map;
 @RestController
 public class HashMapController {
     @Autowired
-    Map<String, String> map;
+    TrivialStringHashMap map;
 
     @PostMapping("/put/{key}")
     public void put(@RequestBody String value, @PathVariable String key) {
