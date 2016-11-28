@@ -87,6 +87,13 @@
                         <SECURITY_USER_NAME>admin</SECURITY_USER_NAME>
                         <SECURITY_USER_PASSWORD>admin</SECURITY_USER_PASSWORD>
                     </env>
+                    <!--<services>-->
+                        <!--<service>-->
+                            <!--<name>hashmap-instance</name>-->
+                            <!--<label>hashmap</label>-->
+                            <!--<plan>default</plan>-->
+                        <!--</service>-->
+                    <!--</services>-->
                 </configuration>
             </plugin>
 		</plugins>
