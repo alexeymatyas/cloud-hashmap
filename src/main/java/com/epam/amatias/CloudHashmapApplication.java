@@ -16,6 +16,7 @@ public class CloudHashmapApplication {
 
 	@Bean
 	Map<String, String> getMap() {
+		// TODO: Implement custom HashMap
 		return new HashMap<>();
 	}
 }

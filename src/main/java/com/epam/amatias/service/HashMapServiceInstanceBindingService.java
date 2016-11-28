@@ -1,5 +1,9 @@
 package com.epam.amatias.service;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.cloud.Cloud;
+import org.springframework.cloud.CloudFactory;
 import org.springframework.cloud.servicebroker.model.CreateServiceInstanceAppBindingResponse;
 import org.springframework.cloud.servicebroker.model.CreateServiceInstanceBindingRequest;
 import org.springframework.cloud.servicebroker.model.CreateServiceInstanceBindingResponse;
@@ -8,6 +12,7 @@ import org.springframework.cloud.servicebroker.service.ServiceInstanceBindingSer
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,11 +20,16 @@ import java.util.Map;
  */
 @Service
 public class HashMapServiceInstanceBindingService implements ServiceInstanceBindingService {
+	private static final Log logger = LogFactory.getLog(HashMapServiceInstanceBindingService.class);
 
 	@Override
 	public CreateServiceInstanceBindingResponse createServiceInstanceBinding(CreateServiceInstanceBindingRequest request) {
-		Map<String, Object> credentials =
-				Collections.singletonMap("url", "http://hashmap-service-broker.local.pcfdev.io");
+		CloudFactory cloudFactory = new CloudFactory();
+		Cloud cloud = cloudFactory.getCloud();
+        Map appProperties = cloud.getApplicationInstanceInfo().getProperties();
+
+		Map<String, Object> credentials = Collections.singletonMap("url",
+                "http://" + ((List<String>)appProperties.get("uris")).get(0));
 		return new CreateServiceInstanceAppBindingResponse().withCredentials(credentials);
 	}
 
