@@ -11,42 +11,52 @@ public class TrivialStringHashMap {
     private static final int DEFAULT_CAPACITY = 8;
 
     List<List<Entry>> buckets;
+    List<Entry> entries;
 
     public TrivialStringHashMap() {
-        this.buckets = new ArrayList<>(DEFAULT_CAPACITY);
-        for(int i = 0; i < DEFAULT_CAPACITY; i++) {
-            this.buckets.add(null);
-        }
+        create(DEFAULT_CAPACITY);
     }
 
     public void put(String key, String value) {
-        int hash = hash(key);
+        int hash = getHash(key);
         int index = getIndex(hash);
         List<Entry> bucket = buckets.get(index);
+
         if(bucket == null) {
+            // Nothing at position
             List<Entry> newBucket = new LinkedList<>();
-            newBucket.add(new Entry(key, value));
+            Entry newEntry = new Entry(key, value);
+            newBucket.add(newEntry);
             buckets.set(index, newBucket);
+            entries.add(newEntry);
         } else {
             if(bucket.get(0).getHash() == hash) {
+                // Something with same hash at position...
                 boolean isInBucket = false;
                 for(Entry e: bucket) {
                     if(e.getKey().equals(key)) {
+                        // ... and same key -> updating existing entry
                         isInBucket = true;
                         e.setValue(value);
                         break;
                     }
                 }
                 if(!isInBucket) {
-                    bucket.add(new Entry(key, value));
+                    //... with key not present in bucket -> hash collision -> tailing new entry
+                    Entry newEntry = new Entry(key, value);
+                    bucket.add(newEntry);
+                    entries.add(newEntry);
                 }
+            } else {
+                // Something with different hash at position -> current capacity is not enough
+                resize();
+                put(key, value);
             }
         }
     }
 
     public String get(String key) {
-        String value = null;
-        List<Entry> bucket = buckets.get(getIndex(hash(key)));
+        List<Entry> bucket = buckets.get(getIndex(getHash(key)));
 
         if(bucket != null) {
             if(bucket.size() == 1) {
@@ -63,14 +73,30 @@ public class TrivialStringHashMap {
         return null;
     }
 
-    static final int hash(Object key) {
-        int h;
-//        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    static final int getHash(Object key) {
         return key.hashCode();
     }
 
     private int getIndex(int hash) {
-        return (DEFAULT_CAPACITY-1) & hash;
+        return (buckets.size()-1) & hash;
+    }
+
+    void resize() {
+        List<Entry> oldEntries = new ArrayList<>(entries);
+        create(buckets.size() << 1);
+
+        for(Entry e: oldEntries) {
+            put(e.getKey(), e.getValue());
+        }
+    }
+
+    void create(int size) {
+        buckets = new ArrayList<>(size);
+        for(int i = 0; i < size; i++) {
+            this.buckets.add(null);
+        }
+
+        entries = new ArrayList<>(size);
     }
 
     class Entry {
@@ -81,6 +107,7 @@ public class TrivialStringHashMap {
         public Entry(String key, String value) {
             this.key = key;
             this.value = value;
+            this.hash = TrivialStringHashMap.getHash(key);
         }
 
         public Integer getHash() {

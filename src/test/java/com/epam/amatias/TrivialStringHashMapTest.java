@@ -20,7 +20,23 @@ public class TrivialStringHashMapTest {
 
     @Test
     public void shouldReturnPreviouslyPutString() {
-        hashMap.put("testKey", "testValue");
-        assertThat(hashMap.get("testKey"), is(equalTo("testValue")));
+        String key = "key";
+        String value = "value";
+
+        hashMap.put(key, value);
+        assertThat(hashMap.get(key), is(equalTo(value)));
+
+        hashMap.put(value, key);
+        assertThat(hashMap.get(value), is(equalTo(key)));
+    }
+
+    @Test
+    public void shouldWorkForManyItems() {
+        for(Integer i = 0; i < 100; i++) {
+            String key = i.toString();
+            String value = key + "value";
+            hashMap.put(key, value);
+            assertThat(hashMap.get(key), is(equalTo(value)));
+        }
     }
 }
